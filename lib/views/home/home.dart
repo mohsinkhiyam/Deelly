@@ -3,6 +3,8 @@ import 'package:deelly/core/assets/images_assets.dart';
 import 'package:deelly/core/colors/app_colors.dart';
 import 'package:deelly/core/utils/extensions.dart';
 import 'package:deelly/core/utils/responsive_config.dart';
+import 'package:deelly/providers/deal_selection_provider.dart';
+import 'package:deelly/providers/discount_filter_provider.dart';
 import 'package:deelly/views/common/app_bar.dart';
 import 'package:deelly/views/common/app_text.dart';
 import 'package:deelly/views/home/widgets/deals_card.dart';
@@ -10,6 +12,7 @@ import 'package:deelly/views/home/widgets/our_partners.dart';
 import 'package:deelly/views/home/widgets/offfers_carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -202,98 +205,133 @@ class _HomeState extends State<Home> {
                   SizedBox(height: 16.h),
 
                   Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AppText(text: "Filter By Discount", fontSize: 18),
-                      SizedBox(height: 5.h),
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    AppText(text: "Filter By Discount", fontSize: 18),
+    SizedBox(height: 5.h),
 
-                      SizedBox(
-                        height: 40.h,
-                        child: ListView.separated(
-                          scrollDirection: Axis.horizontal,
-                          separatorBuilder: (context, index) =>
-                              SizedBox(width: 10),
-                          itemCount: 4,
-                          itemBuilder: (context, index) {
-                            return Container(
-                              height: 40.h,
-                              width: 100.w,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                  color: AppColors.discountBorder,
-                                  width: 1,
-                                ),
-                              ),
+    Consumer<DiscountFilterProvider>(
+      builder: (context, discountProvider, _) {
+        final discounts = ["Up to 10%", "Up to 20%", "Up to 30%", "Up to 50%"];
 
-                              child: AppText(
-                                text: "Up to 10%",
-                                color: AppColors.discountText,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
+        return SizedBox(
+          height: 40.h,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            separatorBuilder: (context, index) => SizedBox(width: 10),
+            itemCount: discounts.length,
+            itemBuilder: (context, index) {
+              final isSelected = discountProvider.selectedIndex == index;
+
+              return GestureDetector(
+                onTap: () => discountProvider.selectDiscount(index),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  height: 40.h,
+                  width: 100.w,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: isSelected
+                        ? AppColors.primary.withOpacity(0.15)
+                        : Colors.transparent,
+                    border: Border.all(
+                      color: isSelected
+                          ? AppColors.primary
+                          : AppColors.discountBorder,
+                      width: 1,
+                    ),
                   ),
+                  child: AppText(
+                    text: discounts[index],
+                    color: isSelected
+                        ? AppColors.textPrimary
+                        : AppColors.discountText,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      },
+    ),
+  ],
+),
 
                   SizedBox(height: 19.h),
                   Divider(color: AppColors.divider),
                   SizedBox(height: 14.h),
 
                   Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    AppText(text: "Upcoming Deal", fontSize: 18),
+    SizedBox(height: 7.h),
+
+    Consumer<DealSelectionProvider>(
+      builder: (context, dealProvider, _) {
+        return SizedBox(
+          height: 53.h,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            separatorBuilder: (context, index) => SizedBox(width: 10),
+            itemCount: 7,
+            itemBuilder: (context, index) {
+              final isSelected = dealProvider.selectedIndex == index;
+
+              return GestureDetector(
+                onTap: () {
+                  dealProvider.selectDeal(index);
+                },
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  height: 53.h,
+                  width: 40.w,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: isSelected
+                        ? AppColors.primary.withOpacity(0.20)
+                        : Colors.transparent,
+                    border: Border.all(
+                      color: isSelected
+                          ? AppColors.primary
+                          : AppColors.discountBorder,
+                      width: 1,
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      AppText(text: "Upcoming Deal", fontSize: 18),
-                      SizedBox(height: 7.h),
-
-                      SizedBox(
-                        height: 53.h,
-
-                        child: ListView.separated(
-                          scrollDirection: Axis.horizontal,
-                          separatorBuilder: (context, index) =>
-                              SizedBox(width: 10),
-                          itemCount: 7,
-                          itemBuilder: (context, index) {
-                            return Container(
-                              height: 53.h,
-                              width: 40.w,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                  color: AppColors.discountBorder,
-                                  width: 1,
-                                ),
-                              ),
-
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  AppText(
-                                    text: "25",
-                                    color: AppColors.dealText,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                  AppText(
-                                    text: "Today",
-                                    color: AppColors.dealText,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
+                      AppText(
+                        text: "25",
+                        color: isSelected
+                            ? AppColors.textPrimary
+                            : AppColors.dealText,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      AppText(
+                        text: "Today",
+                        color: isSelected
+                            ? AppColors.textPrimary
+                            : AppColors.dealText,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w400,
                       ),
                     ],
                   ),
+                ),
+              );
+            },
+          ),
+        );
+      },
+    ),
+  ],
+),
                   SizedBox(height: 34.h),
                   OfffersCarouselSlider(),
                   SizedBox(height: 20.h),

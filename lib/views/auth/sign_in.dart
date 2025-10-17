@@ -1,12 +1,16 @@
 import 'package:deelly/core/assets/icons_assets.dart';
 import 'package:deelly/core/colors/app_colors.dart';
+import 'package:deelly/core/routes/routes.dart';
 import 'package:deelly/core/utils/responsive_config.dart';
+import 'package:deelly/core/utils/validators.dart';
+import 'package:deelly/providers/auth_provider.dart';
 import 'package:deelly/views/common/app_button.dart';
 import 'package:deelly/views/common/app_form_field.dart';
 import 'package:deelly/views/common/app_text.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({super.key});
@@ -55,6 +59,7 @@ class _SignInState extends State<SignIn> {
                       text: "Email",
                       hint: "Email",
                       controller: email,
+                      validator: Validators.validateEmail,
                     ),
                     SizedBox(height: 31.h),
                     AppFormField(
@@ -62,6 +67,7 @@ class _SignInState extends State<SignIn> {
                       hint: "Password",
                       controller: pass,
                       obscureText: true,
+                      validator: Validators.validatePassword,
                     ),
                   ],
                 ),
@@ -149,11 +155,44 @@ class _SignInState extends State<SignIn> {
 
               SizedBox(height: 73.h),
 
-              AppButton(
-                onPressed: () {},
-                text: "Log In",
-                height: 50,
-                minWidth: double.maxFinite,
+              Consumer<AuthProvider>(
+                builder: (context, authProvider, child) {
+                  return AppButton(
+                    loading: authProvider.isLoading,
+                    onPressed: authProvider.isLoading
+                        ? null
+                        : () async {
+                            if (signInformKey.currentState!.validate()) {
+                              await authProvider.login(
+                                email.text.trim(),
+                                pass.text.trim(),
+                                "dcndjc89",
+                              );
+
+                              if (context.mounted) {
+                                if (authProvider.isLoggedIn) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text("Login Successful"),
+                                    ),
+                                  );
+                                 
+                                   Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
+                                } else if (authProvider.errorMessage != null) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(authProvider.errorMessage!),
+                                    ),
+                                  );
+                                }
+                              }
+                            }
+                          },
+                    text: "Log In",
+                    height: 50,
+                    minWidth: double.maxFinite,
+                  );
+                },
               ),
             ],
           ),

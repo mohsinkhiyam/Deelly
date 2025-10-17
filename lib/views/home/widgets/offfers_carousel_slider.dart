@@ -140,7 +140,6 @@ class _OfffersCarouselSliderState extends State<OfffersCarouselSlider> {
 
         const SizedBox(height: 10),
 
-        // 🔘 Custom indicators
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: imgList.asMap().entries.map((entry) {

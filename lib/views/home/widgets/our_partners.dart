@@ -28,7 +28,7 @@ class OurPartners extends StatelessWidget {
       SizedBox(height: 9.h,),
        GridView.builder(
         shrinkWrap: true,
-       
+      physics: NeverScrollableScrollPhysics(),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 3,
           mainAxisSpacing: 10,
