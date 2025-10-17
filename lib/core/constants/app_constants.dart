@@ -1,0 +1,2 @@
+//FontFamily
+const kOutfitFontFamily = "Outfit";
